@@ -1,0 +1,25 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@ng-realworld/features/home": ["libs/features/home/src/index.ts"],
+      "@ng-realworld/features/login": ["libs/features/login/src/index.ts"],
+      "@ng-realworld/features/register": ["libs/features/register/src/index.ts"],
+      "@ng-realworld/ui/layout": ["libs/ui/layout/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}
