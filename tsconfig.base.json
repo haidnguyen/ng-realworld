@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@ng-realworld/data-access/trpc": ["libs/data-access/trpc/src/index.ts"],
       "@ng-realworld/features/home": ["libs/features/home/src/index.ts"],
       "@ng-realworld/features/login": ["libs/features/login/src/index.ts"],
       "@ng-realworld/features/register": ["libs/features/register/src/index.ts"],
