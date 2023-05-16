@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { fromProcedure, injectTRPC } from '@ng-realworld/data-access/trpc-client';
 
 @Component({
   selector: 'ng-realworld-login',
@@ -46,6 +47,7 @@ import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angula
 })
 export class LoginComponent {
   private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly client = injectTRPC();
 
   readonly form = this.formBuilder.group({
     email: this.formBuilder.control('', [Validators.required]),
@@ -54,6 +56,9 @@ export class LoginComponent {
 
   onSubmit() {
     const formValue = this.form.getRawValue();
+    fromProcedure(this.client.getTest.query)(formValue.email).subscribe(resp => {
+      console.log({ resp });
+    });
     console.log({ formValue });
   }
 }
