@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { ReactiveFormsModule, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { fromProcedure, injectTRPC } from '@ng-realworld/data-access/trpc-client';
 
 @Component({
   selector: 'ng-realworld-register',
@@ -51,6 +52,7 @@ import { ReactiveFormsModule, NonNullableFormBuilder, Validators } from '@angula
 })
 export class RegisterComponent {
   private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly client = injectTRPC();
 
   readonly form = this.formBuilder.group({
     username: this.formBuilder.control('', [Validators.required]),
@@ -61,5 +63,13 @@ export class RegisterComponent {
   onSubmit() {
     const formValue = this.form.getRawValue();
     console.log({ formValue });
+    fromProcedure(this.client.user.createUser.mutate)(formValue).subscribe({
+      next: result => {
+        console.log({ result });
+      },
+      error: err => {
+        console.log({ err });
+      },
+    });
   }
 }
