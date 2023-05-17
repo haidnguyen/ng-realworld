@@ -1,0 +1,26 @@
+{
+  "name": "data-access-model",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/data-access/model/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/data-access/model",
+        "main": "libs/data-access/model/src/index.ts",
+        "tsConfig": "libs/data-access/model/tsconfig.lib.json",
+        "assets": ["libs/data-access/model/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/data-access/model/**/*.ts"]
+      }
+    }
+  },
+  "tags": []
+}
