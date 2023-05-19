@@ -1,6 +1,6 @@
 import { InjectionToken, Provider, inject } from '@angular/core';
-import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 import { AppRouter } from '@ng-realworld/data-access/trpc';
+import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 
 interface TRPCClientConfig {
   url: string;

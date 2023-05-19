@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { fromProcedure, injectTRPC } from '@ng-realworld/data-access/trpc-client';
+import { fromProcedure, injectTRPC, isTRPCClientError } from '@ng-realworld/data-access/trpc-client';
 
 @Component({
   selector: 'ng-realworld-register',
@@ -63,12 +63,15 @@ export class RegisterComponent {
   onSubmit() {
     const formValue = this.form.getRawValue();
     console.log({ formValue });
-    fromProcedure(this.client.user.createUser.mutate)(formValue).subscribe({
+    fromProcedure(this.client.user.create.mutate)(formValue).subscribe({
       next: result => {
         console.log({ result });
       },
       error: err => {
-        console.log({ err });
+        if (isTRPCClientError(err)) {
+          console.log(err);
+          console.log(err.data?.flatError);
+        }
       },
     });
   }

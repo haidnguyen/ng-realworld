@@ -1,14 +1,10 @@
 import * as trpcExpress from '@trpc/server/adapters/express';
-import { createContext, router } from './core';
-import { userRoute } from './routes/user.route';
-
-const appRouter = router({
-  user: userRoute,
-});
-
-export type AppRouter = typeof appRouter;
+import { createContext } from './core';
+import { appRouter } from './routes/_app';
 
 export const trpcMiddleware = trpcExpress.createExpressMiddleware({
   router: appRouter,
   createContext,
 });
+
+export type AppRouter = typeof appRouter;
