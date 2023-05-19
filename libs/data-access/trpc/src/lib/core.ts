@@ -28,3 +28,4 @@ const t = initTRPC.context<typeof createContext>().create({
 export const procedure = t.procedure;
 export const middleware = t.middleware;
 export const router = t.router;
+export const SALT_ROUND = 10;

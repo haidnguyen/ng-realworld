@@ -9,6 +9,9 @@ export const userSchema = z.object({
 });
 
 export const userRegistrationSchema = userSchema.pick({ username: true, email: true }).extend({ password: z.string() });
+export const userLoginSchema = userSchema.pick({ email: true }).extend({ password: z.string() });
+export const userTokenPayloadSchema = userSchema.pick({ id: true, email: true });
 
 export type User = z.infer<typeof userSchema>;
 export type UserRegistration = z.infer<typeof userRegistrationSchema>;
+export type UserLogin = z.infer<typeof userLoginSchema>;
