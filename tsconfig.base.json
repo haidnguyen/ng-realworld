@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@ng-realworld/data-access/model": ["libs/data-access/model/src/index.ts"],
+      "@ng-realworld/data-access/service": ["libs/data-access/service/src/index.ts"],
       "@ng-realworld/data-access/trpc": ["libs/data-access/trpc/src/index.ts"],
       "@ng-realworld/data-access/trpc-client": ["libs/data-access/trpc-client/src/index.ts"],
       "@ng-realworld/features/home": ["libs/features/home/src/index.ts"],

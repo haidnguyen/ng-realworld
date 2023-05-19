@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '@ng-realworld/data-access/service';
 import { fromProcedure, injectTRPC, isTRPCClientError } from '@ng-realworld/data-access/trpc-client';
 
 @Component({
@@ -48,6 +49,7 @@ import { fromProcedure, injectTRPC, isTRPCClientError } from '@ng-realworld/data
 export class LoginComponent {
   private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly client = injectTRPC();
+  private readonly authService = inject(AuthService);
 
   readonly form = this.formBuilder.group({
     email: this.formBuilder.control('', [Validators.required]),
@@ -58,7 +60,8 @@ export class LoginComponent {
     const formValue = this.form.getRawValue();
     fromProcedure(this.client.user.login.mutate)(formValue).subscribe({
       next: result => {
-        console.log({ result });
+        this.authService.authenticated(result.user);
+        this.authService.registerToken(result.token);
       },
       error: err => {
         if (isTRPCClientError(err)) {
@@ -66,7 +69,5 @@ export class LoginComponent {
         }
       },
     });
-
-    console.log({ formValue });
   }
 }

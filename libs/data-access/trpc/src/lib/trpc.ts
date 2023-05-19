@@ -1,6 +1,6 @@
 import * as trpcExpress from '@trpc/server/adapters/express';
 import { createContext } from './core';
-import { appRouter } from './routes/_app';
+import { appRouter } from './route/_app';
 
 export const trpcMiddleware = trpcExpress.createExpressMiddleware({
   router: appRouter,

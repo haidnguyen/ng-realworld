@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '@ng-realworld/data-access/service';
+import { fromProcedure, injectTRPC } from '@ng-realworld/data-access/trpc-client';
 
 @Component({
   selector: 'ng-realworld-header',
@@ -26,17 +28,55 @@ import { RouterModule } from '@angular/router';
               &nbsp;Settings
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/login" routerLinkActive="active">Sign in</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/register" routerLinkActive="active">Sign up</a>
-          </li>
+
+          <ng-container *ngIf="isAuth(); else unauthTmpl">
+            <li class="nav-item logout-btn">
+              <a class="nav-link" (click)="onLogout()">Logout</a>
+            </li>
+          </ng-container>
+
+          <ng-template #unauthTmpl>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/login" routerLinkActive="active">Sign in</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/register" routerLinkActive="active">Sign up</a>
+            </li>
+          </ng-template>
         </ul>
       </div>
     </nav>
   `,
-  styles: [],
+  styles: [
+    `
+      .logout-btn {
+        cursor: pointer;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HeaderComponent {}
+export class HeaderComponent implements OnInit {
+  private readonly authService = inject(AuthService);
+  private readonly client = injectTRPC();
+  readonly isAuth = this.authService.isAuth;
+
+  readonly user = this.authService.currentUser;
+
+  ngOnInit(): void {
+    if (this.authService.isAuth()) {
+      fromProcedure(this.client.user.me.query)().subscribe({
+        next: user => {
+          this.authService.authenticated(user);
+        },
+        error: () => {
+          this.authService.logout();
+        },
+      });
+    }
+  }
+
+  onLogout() {
+    this.authService.logout();
+  }
+}

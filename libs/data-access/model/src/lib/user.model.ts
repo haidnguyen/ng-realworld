@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
 export const userSchema = z.object({
+  id: z.number(),
   email: z.string().email(),
-  token: z.string(),
   username: z.string(),
   bio: z.string(),
-  image: z.string(),
+  image: z.string().nullable(),
 });
 
 export const userRegistrationSchema = userSchema.pick({ username: true, email: true }).extend({ password: z.string() });
