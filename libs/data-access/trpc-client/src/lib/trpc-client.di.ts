@@ -15,6 +15,9 @@ export const provideTRPCClient = (config: TRPCClientConfig): Provider => ({
       links: [
         httpBatchLink({
           url: config.url,
+          async fetch(url, options) {
+            return await fetch(url, { ...options, credentials: 'include' });
+          },
         }),
       ],
     });

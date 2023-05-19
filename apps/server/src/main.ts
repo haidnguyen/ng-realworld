@@ -1,10 +1,10 @@
-import express from 'express';
 import { trpcMiddleware } from '@ng-realworld/data-access/trpc';
-import * as path from 'path';
 import cors from 'cors';
+import express from 'express';
+import * as path from 'path';
 
 const app = express();
-app.use(cors());
+app.use(cors({ credentials: true, origin: true }));
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 app.use('/trpc', trpcMiddleware);
 

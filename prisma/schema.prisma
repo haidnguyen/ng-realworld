@@ -11,10 +11,11 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  username String
-  bio      String @default("")
-  image    String @default("")
-  password String
+  id           Int     @id @default(autoincrement())
+  email        String  @unique
+  username     String
+  bio          String  @default("")
+  image        String?
+  password     String
+  refreshToken String?
 }

@@ -40,12 +40,24 @@ const loginProcedure = procedure.input(userLoginSchema).mutation(async ({ input,
   }
 
   const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '600s' });
+  const refreshToken = jwt.sign({ id: user.id }, JWT_SECRET);
+  ctx.res.cookie('refreshToken', refreshToken, { httpOnly: true });
+  await ctx.prisma.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      refreshToken,
+    },
+  });
 
   return {
     token,
+    refreshToken,
     user: omit(user, ['password']),
   };
 });
+
 export const userRoute = router({
   create: createUserProcedure,
   login: loginProcedure,
