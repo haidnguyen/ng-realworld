@@ -18,4 +18,8 @@ export const appRoutes: Route[] = [
     path: 'register',
     loadComponent: () => import('@ng-realworld/features/register').then(m => m.RegisterComponent),
   },
+  {
+    path: 'setting',
+    loadComponent: () => import('@ng-realworld/features/setting').then(m => m.SettingComponent),
+  },
 ];

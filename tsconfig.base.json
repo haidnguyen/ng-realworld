@@ -22,6 +22,7 @@
       "@ng-realworld/features/home": ["libs/features/home/src/index.ts"],
       "@ng-realworld/features/login": ["libs/features/login/src/index.ts"],
       "@ng-realworld/features/register": ["libs/features/register/src/index.ts"],
+      "@ng-realworld/features/setting": ["libs/features/setting/src/index.ts"],
       "@ng-realworld/ui/layout": ["libs/ui/layout/src/index.ts"]
     }
   },

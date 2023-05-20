@@ -1,9 +1,22 @@
-import { userLoginSchema, userRegistrationSchema, userTokenPayloadSchema } from '@ng-realworld/data-access/model';
+import {
+  userLoginSchema,
+  userRegistrationSchema,
+  userTokenPayloadSchema,
+  userUpdateSchema,
+} from '@ng-realworld/data-access/model';
+import { Prisma } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { omit } from 'remeda';
 import { JWT_SECRET, SALT_ROUND, procedure, protectedProcedure, router } from '../core';
+
+const userCommonSelect: Prisma.UserSelect = {
+  id: true,
+  username: true,
+  email: true,
+  bio: true,
+  image: true,
+};
 
 const createUserProcedure = procedure.input(userRegistrationSchema).mutation(async ({ input, ctx }) => {
   const hashedPassword = await bcrypt.hash(input.password, SALT_ROUND);
@@ -13,13 +26,7 @@ const createUserProcedure = procedure.input(userRegistrationSchema).mutation(asy
       email: input.email,
       password: hashedPassword,
     },
-    select: {
-      id: true,
-      username: true,
-      email: true,
-      bio: true,
-      image: true,
-    },
+    select: userCommonSelect,
   });
   return createdUser;
 });
@@ -47,12 +54,13 @@ const loginProcedure = procedure.input(userLoginSchema).mutation(async ({ input,
     data: {
       refreshToken,
     },
+    select: userCommonSelect,
   });
 
   return {
     token,
     refreshToken,
-    user: omit(user, ['password']),
+    user,
   };
 });
 
@@ -91,9 +99,26 @@ const meProcedure = protectedProcedure.query(({ ctx }) => {
   return user;
 });
 
+const updateProcedure = protectedProcedure.input(userUpdateSchema).mutation(async ({ ctx, input }) => {
+  const data = input;
+
+  if (input.password) {
+    data.password = await bcrypt.hash(input.password, SALT_ROUND);
+  }
+
+  const updatedUser = await ctx.prisma.user.update({
+    where: { id: ctx.user.id },
+    data,
+    select: userCommonSelect,
+  });
+
+  return updatedUser;
+});
+
 export const userRoute = router({
   create: createUserProcedure,
   login: loginProcedure,
   me: meProcedure,
   accessToken: accessTokenProcedure,
+  update: updateProcedure,
 });

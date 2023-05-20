@@ -23,7 +23,7 @@ import { fromProcedure, injectTRPC } from '@ng-realworld/data-access/trpc-client
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="">
+            <a class="nav-link" routerLink="/setting" routerLinkActive="active">
               <i class="ion-gear-a"></i>
               &nbsp;Settings
             </a>
