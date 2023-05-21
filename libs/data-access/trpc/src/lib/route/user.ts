@@ -115,7 +115,7 @@ const updateProcedure = protectedProcedure.input(userUpdateSchema).mutation(asyn
   return updatedUser;
 });
 
-export const userRoute = router({
+export const userRouter = router({
   create: createUserProcedure,
   login: loginProcedure,
   me: meProcedure,

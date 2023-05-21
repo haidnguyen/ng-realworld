@@ -1,6 +1,8 @@
 import { router } from '../core';
-import { userRoute } from './user';
+import { articleRouter } from './article';
+import { userRouter } from './user';
 
 export const appRouter = router({
-  user: userRoute,
+  user: userRouter,
+  article: articleRouter,
 });

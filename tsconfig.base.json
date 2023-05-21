@@ -10,22 +10,49 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": ["es2020", "dom"],
+    "lib": [
+      "es2020",
+      "dom",
+      "ES2021"
+    ],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@ng-realworld/data-access/model": ["libs/data-access/model/src/index.ts"],
-      "@ng-realworld/data-access/service": ["libs/data-access/service/src/index.ts"],
-      "@ng-realworld/data-access/trpc": ["libs/data-access/trpc/src/index.ts"],
-      "@ng-realworld/data-access/trpc-client": ["libs/data-access/trpc-client/src/index.ts"],
-      "@ng-realworld/features/editor": ["libs/features/editor/src/index.ts"],
-      "@ng-realworld/features/home": ["libs/features/home/src/index.ts"],
-      "@ng-realworld/features/login": ["libs/features/login/src/index.ts"],
-      "@ng-realworld/features/register": ["libs/features/register/src/index.ts"],
-      "@ng-realworld/features/setting": ["libs/features/setting/src/index.ts"],
-      "@ng-realworld/ui/layout": ["libs/ui/layout/src/index.ts"]
+      "@ng-realworld/data-access/model": [
+        "libs/data-access/model/src/index.ts"
+      ],
+      "@ng-realworld/data-access/service": [
+        "libs/data-access/service/src/index.ts"
+      ],
+      "@ng-realworld/data-access/trpc": [
+        "libs/data-access/trpc/src/index.ts"
+      ],
+      "@ng-realworld/data-access/trpc-client": [
+        "libs/data-access/trpc-client/src/index.ts"
+      ],
+      "@ng-realworld/features/editor": [
+        "libs/features/editor/src/index.ts"
+      ],
+      "@ng-realworld/features/home": [
+        "libs/features/home/src/index.ts"
+      ],
+      "@ng-realworld/features/login": [
+        "libs/features/login/src/index.ts"
+      ],
+      "@ng-realworld/features/register": [
+        "libs/features/register/src/index.ts"
+      ],
+      "@ng-realworld/features/setting": [
+        "libs/features/setting/src/index.ts"
+      ],
+      "@ng-realworld/ui/layout": [
+        "libs/ui/layout/src/index.ts"
+      ]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
 }
