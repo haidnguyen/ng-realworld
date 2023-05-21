@@ -22,4 +22,8 @@ export const appRoutes: Route[] = [
     path: 'setting',
     loadComponent: () => import('@ng-realworld/features/setting').then(m => m.SettingComponent),
   },
+  {
+    path: 'editor',
+    loadComponent: () => import('@ng-realworld/features/editor').then(m => m.EditorComponent),
+  },
 ];

@@ -17,7 +17,7 @@ import { fromProcedure, injectTRPC } from '@ng-realworld/data-access/trpc-client
             <a class="nav-link" routerLink="/home" routerLinkActive="active">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="">
+            <a class="nav-link" routerLink="/editor" routerLinkActive="active">
               <i class="ion-compose"></i>
               &nbsp;New Article
             </a>
@@ -31,7 +31,7 @@ import { fromProcedure, injectTRPC } from '@ng-realworld/data-access/trpc-client
 
           <ng-container *ngIf="isAuth(); else unauthTmpl">
             <li class="nav-item logout-btn">
-              <a class="nav-link" (click)="onLogout()">Logout</a>
+              <a class="nav-link">{{ user()?.username }}</a>
             </li>
           </ng-container>
 
@@ -60,7 +60,6 @@ export class HeaderComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly client = injectTRPC();
   readonly isAuth = this.authService.isAuth;
-
   readonly user = this.authService.currentUser;
 
   ngOnInit(): void {
@@ -74,9 +73,5 @@ export class HeaderComponent implements OnInit {
         },
       });
     }
-  }
-
-  onLogout() {
-    this.authService.logout();
   }
 }
