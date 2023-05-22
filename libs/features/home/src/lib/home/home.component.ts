@@ -36,7 +36,9 @@ import { switchMap } from 'rxjs';
               <div class="article-meta">
                 <a routerLink="/"><img src="http://i.imgur.com/N4VcUeJ.jpg" /></a>
                 <div class="info">
-                  <a routerLink="/profile" class="author">{{ article.author.username }}</a>
+                  <a [routerLink]="['/', 'profile', article.author.username]" class="author">
+                    {{ article.author.username }}
+                  </a>
                   <span class="date">{{ article.createdAt | date : 'mediumDate' }}</span>
                 </div>
                 <button class="btn btn-outline-primary btn-sm pull-xs-right">
@@ -44,7 +46,7 @@ import { switchMap } from 'rxjs';
                   32
                 </button>
               </div>
-              <a [routerLink]="['article', article.slug]" class="preview-link">
+              <a [routerLink]="['/', 'article', article.slug]" class="preview-link">
                 <h1>{{ article.title }}</h1>
                 <p>{{ article.description }}</p>
                 <span>Read more...</span>

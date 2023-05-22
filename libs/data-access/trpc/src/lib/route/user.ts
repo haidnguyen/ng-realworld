@@ -1,6 +1,7 @@
 import {
   userLoginSchema,
   userRegistrationSchema,
+  userSchema,
   userTokenPayloadSchema,
   userUpdateSchema,
 } from '@ng-realworld/data-access/model';
@@ -115,10 +116,32 @@ const updateProcedure = protectedProcedure.input(userUpdateSchema).mutation(asyn
   return updatedUser;
 });
 
+const getByUsernameProcedure = procedure.input(userSchema.pick({ username: true })).query(async ({ ctx, input }) => {
+  const user = await ctx.prisma.user.findUnique({
+    where: { username: input.username },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      bio: true,
+      image: true,
+      articles: {
+        include: {
+          author: true,
+          tags: true,
+        },
+      },
+    },
+  });
+
+  return user;
+});
+
 export const userRouter = router({
   create: createUserProcedure,
   login: loginProcedure,
   me: meProcedure,
   accessToken: accessTokenProcedure,
   update: updateProcedure,
+  getByUsername: getByUsernameProcedure,
 });

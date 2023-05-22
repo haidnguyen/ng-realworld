@@ -31,4 +31,8 @@ export const appRoutes: Route[] = [
     loadComponent: () => import('@ng-realworld/features/editor').then(m => m.EditorComponent),
     canActivate: [authenticatedGuard],
   },
+  {
+    path: 'profile/:username',
+    loadComponent: () => import('@ng-realworld/features/profile').then(m => m.ProfileComponent),
+  },
 ];
