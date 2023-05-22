@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { protectedProcedure, router } from '../core';
+import { procedure, protectedProcedure, router } from '../core';
 
 const addProcedure = protectedProcedure
   .input(
@@ -38,6 +38,35 @@ const addProcedure = protectedProcedure
     return article;
   });
 
+const listProcedure = procedure
+  .input(
+    z
+      .object({
+        tagId: z.number().optional(),
+      })
+      .optional()
+  )
+  .query(async ({ ctx, input }) => {
+    const articles = await ctx.prisma.article.findMany({
+      where: {
+        tags: {
+          some: {
+            id: input?.tagId,
+          },
+        },
+      },
+      include: {
+        author: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return articles;
+  });
+
 export const articleRouter = router({
   add: addProcedure,
+  list: listProcedure,
 });

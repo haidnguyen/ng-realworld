@@ -16,13 +16,13 @@ import { fromProcedure, injectTRPC } from '@ng-realworld/data-access/trpc-client
           <li class="nav-item">
             <a class="nav-link" routerLink="/home" routerLinkActive="active">Home</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" *ngIf="isAuth()">
             <a class="nav-link" routerLink="/editor" routerLinkActive="active">
               <i class="ion-compose"></i>
               &nbsp;New Article
             </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" *ngIf="isAuth()">
             <a class="nav-link" routerLink="/setting" routerLinkActive="active">
               <i class="ion-gear-a"></i>
               &nbsp;Settings
@@ -68,8 +68,8 @@ export class HeaderComponent implements OnInit {
         next: user => {
           this.authService.authenticated(user);
         },
-        error: () => {
-          this.authService.logout();
+        error: (err: unknown) => {
+          console.log({ err });
         },
       });
     }

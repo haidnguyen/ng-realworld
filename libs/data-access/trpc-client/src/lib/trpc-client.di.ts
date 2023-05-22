@@ -1,6 +1,6 @@
 import { InjectionToken, Provider, inject } from '@angular/core';
 import { AppRouter } from '@ng-realworld/data-access/trpc';
-import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
+import { TRPCClientError, createTRPCProxyClient, httpLink } from '@trpc/client';
 
 interface TRPCClientConfig {
   url: string;
@@ -13,7 +13,7 @@ export const provideTRPCClient = (config: TRPCClientConfig): Provider => ({
   useFactory: () => {
     const internalClient = createTRPCProxyClient<AppRouter>({
       links: [
-        httpBatchLink({
+        httpLink({
           url: config.url,
           async fetch(url, options) {
             return await fetch(url, { ...options, credentials: 'include' });
@@ -31,13 +31,13 @@ export const provideTRPCClient = (config: TRPCClientConfig): Provider => ({
     });
     const client = createTRPCProxyClient<AppRouter>({
       links: [
-        httpBatchLink({
+        httpLink({
           url: config.url,
           async fetch(url, options) {
             const response = await fetch(url, { ...options, credentials: 'include' });
             if (!response.ok) {
               const json = await response.json();
-              const message = json[0].error.message;
+              const message = json.error.message;
               if (message === 'TOKEN_EXPIRED') {
                 const result = await internalClient.user.accessToken.query();
                 localStorage.setItem('__TOKEN__', result.token);
@@ -50,6 +50,7 @@ export const provideTRPCClient = (config: TRPCClientConfig): Provider => ({
                   },
                 });
               }
+              throw new TRPCClientError(json.error.message, { result: json });
             }
             return response;
           },

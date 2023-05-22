@@ -1,4 +1,5 @@
 import { Route } from '@angular/router';
+import { authenticatedGuard, unauthenticatedGuard } from '@ng-realworld/data-access/service';
 
 export const appRoutes: Route[] = [
   {
@@ -13,17 +14,21 @@ export const appRoutes: Route[] = [
   {
     path: 'login',
     loadComponent: () => import('@ng-realworld/features/login').then(m => m.LoginComponent),
+    canActivate: [unauthenticatedGuard],
   },
   {
     path: 'register',
     loadComponent: () => import('@ng-realworld/features/register').then(m => m.RegisterComponent),
+    canActivate: [unauthenticatedGuard],
   },
   {
     path: 'setting',
     loadComponent: () => import('@ng-realworld/features/setting').then(m => m.SettingComponent),
+    canActivate: [authenticatedGuard],
   },
   {
     path: 'editor',
     loadComponent: () => import('@ng-realworld/features/editor').then(m => m.EditorComponent),
+    canActivate: [authenticatedGuard],
   },
 ];

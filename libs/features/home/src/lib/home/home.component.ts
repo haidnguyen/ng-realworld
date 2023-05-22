@@ -1,10 +1,14 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { RouterModule } from '@angular/router';
+import { fromProcedure, injectTRPC } from '@ng-realworld/data-access/trpc-client';
+import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'ng-realworld-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   template: `
     <div class="home-page">
       <div class="banner">
@@ -28,40 +32,21 @@ import { CommonModule } from '@angular/common';
               </ul>
             </div>
 
-            <div class="article-preview">
+            <div class="article-preview" *ngFor="let article of articles()">
               <div class="article-meta">
-                <a href="profile.html"><img src="http://i.imgur.com/Qr71crq.jpg" /></a>
+                <a routerLink="/"><img src="http://i.imgur.com/N4VcUeJ.jpg" /></a>
                 <div class="info">
-                  <a href="" class="author">Eric Simons</a>
-                  <span class="date">January 20th</span>
-                </div>
-                <button class="btn btn-outline-primary btn-sm pull-xs-right">
-                  <i class="ion-heart"></i>
-                  29
-                </button>
-              </div>
-              <a href="" class="preview-link">
-                <h1>How to build webapps that scale</h1>
-                <p>This is the description for the post.</p>
-                <span>Read more...</span>
-              </a>
-            </div>
-
-            <div class="article-preview">
-              <div class="article-meta">
-                <a href="profile.html"><img src="http://i.imgur.com/N4VcUeJ.jpg" /></a>
-                <div class="info">
-                  <a href="" class="author">Albert Pai</a>
-                  <span class="date">January 20th</span>
+                  <a routerLink="/profile" class="author">{{ article.author.username }}</a>
+                  <span class="date">{{ article.createdAt | date : 'mediumDate' }}</span>
                 </div>
                 <button class="btn btn-outline-primary btn-sm pull-xs-right">
                   <i class="ion-heart"></i>
                   32
                 </button>
               </div>
-              <a href="" class="preview-link">
-                <h1>The song you won't ever stop singing. No matter how hard you try.</h1>
-                <p>This is the description for the post.</p>
+              <a [routerLink]="['article', article.slug]" class="preview-link">
+                <h1>{{ article.title }}</h1>
+                <p>{{ article.description }}</p>
                 <span>Read more...</span>
               </a>
             </div>
@@ -72,14 +57,9 @@ import { CommonModule } from '@angular/common';
               <p>Popular Tags</p>
 
               <div class="tag-list">
-                <a href="" class="tag-pill tag-default">programming</a>
-                <a href="" class="tag-pill tag-default">javascript</a>
-                <a href="" class="tag-pill tag-default">emberjs</a>
-                <a href="" class="tag-pill tag-default">angularjs</a>
-                <a href="" class="tag-pill tag-default">react</a>
-                <a href="" class="tag-pill tag-default">mean</a>
-                <a href="" class="tag-pill tag-default">node</a>
-                <a href="" class="tag-pill tag-default">rails</a>
+                <a class="tag-pill tag-default pointer" *ngFor="let tag of tags()" (click)="onChangeTag(tag.id)">
+                  {{ tag.name }}
+                </a>
               </div>
             </div>
           </div>
@@ -87,7 +67,29 @@ import { CommonModule } from '@angular/common';
       </div>
     </div>
   `,
-  styles: [],
+  styles: [
+    `
+      .pointer {
+        cursor: pointer;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeComponent {}
+export class HomeComponent {
+  private readonly client = injectTRPC();
+
+  readonly selectedTagId = signal<number | undefined>(undefined);
+
+  readonly articles = toSignal(
+    toObservable(this.selectedTagId).pipe(
+      switchMap(tagId => this.client.article.list.query(tagId ? { tagId } : undefined))
+    ),
+    { initialValue: [] }
+  );
+  readonly tags = toSignal(fromProcedure(this.client.tag.list.query)(), { initialValue: [] });
+
+  onChangeTag(tagId: number) {
+    this.selectedTagId.set(tagId);
+  }
+}
