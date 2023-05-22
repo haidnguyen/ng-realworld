@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
-import { injectTRPC } from '@ng-realworld/data-access/trpc-client';
-import { NEVER, switchMap } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { injectTRPC, isTRPCClientError } from '@ng-realworld/data-access/trpc-client';
+import { NEVER, catchError, switchMap } from 'rxjs';
 
 @Component({
   selector: 'ng-realworld-profile',
@@ -73,6 +73,7 @@ import { NEVER, switchMap } from 'rxjs';
 export class ProfileComponent {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly client = injectTRPC();
+  private readonly router = inject(Router);
 
   readonly profile = toSignal(
     this.activatedRoute.paramMap.pipe(
@@ -83,6 +84,14 @@ export class ProfileComponent {
         }
 
         return this.client.user.getByUsername.query({ username });
+      }),
+      catchError(err => {
+        if (isTRPCClientError(err)) {
+          if (err.message === 'NOT_FOUND') {
+            this.router.navigate(['/', 'home']);
+          }
+        }
+        return NEVER;
       })
     ),
     { initialValue: null }

@@ -134,6 +134,12 @@ const getByUsernameProcedure = procedure.input(userSchema.pick({ username: true 
     },
   });
 
+  if (!user) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+    });
+  }
+
   return user;
 });
 

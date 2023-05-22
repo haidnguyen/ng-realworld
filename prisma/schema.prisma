@@ -11,27 +11,29 @@ datasource db {
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
-  email        String    @unique
-  username     String    @unique
-  bio          String    @default("")
-  image        String?
-  password     String
-  refreshToken String?
-  articles     Article[]
+  id                Int                @id @default(autoincrement())
+  email             String             @unique
+  username          String             @unique
+  bio               String             @default("")
+  image             String?
+  password          String
+  refreshToken      String?
+  articles          Article[]
+  favoritedArticles FavoritedArticle[]
 }
 
 model Article {
-  id          Int      @id @default(autoincrement())
-  slug        String   @unique
-  title       String
-  description String
-  body        String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now())
-  author      User     @relation(fields: [authorId], references: [id])
-  authorId    Int
-  tags        Tag[]
+  id                Int                @id @default(autoincrement())
+  slug              String             @unique
+  title             String
+  description       String
+  body              String
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @default(now())
+  author            User               @relation(fields: [authorId], references: [id])
+  authorId          Int
+  tags              Tag[]
+  favoritedArticles FavoritedArticle[]
 }
 
 model Tag {
@@ -39,4 +41,14 @@ model Tag {
   name      String    @unique
   createdAt DateTime  @default(now())
   articles  Article[]
+}
+
+model FavoritedArticle {
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  articleId Int
+  article   Article  @relation(fields: [articleId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@id([userId, articleId])
 }
