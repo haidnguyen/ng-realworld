@@ -15,7 +15,7 @@
               <a class="nav-link">Your Feed</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" [class.active]="!selectedTagId()" (click)="onClearTag()">Global Feed</a>
+              <a class="nav-link" [class.active]="!selectedTag()" (click)="onClearTag()">Global Feed</a>
             </li>
             <li class="nav-item" *ngIf="selectedTag() as tag">
               <a class="nav-link active">

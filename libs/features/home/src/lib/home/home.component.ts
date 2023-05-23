@@ -1,11 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, OnInit, effect, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { fromProcedure, injectTRPC } from '@ng-realworld/data-access/trpc-client';
-import { switchMap } from 'rxjs';
-
-type Awaited<T> = T extends Promise<infer U> ? U : never;
+import { HomeStore, selectAll } from './home.store';
 
 @Component({
   selector: 'ng-realworld-home',
@@ -14,45 +10,35 @@ type Awaited<T> = T extends Promise<infer U> ? U : never;
   templateUrl: './home.component.html',
   styleUrls: ['./home.style.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [HomeStore],
 })
-export class HomeComponent {
-  private readonly client = injectTRPC();
+export class HomeComponent implements OnInit {
+  private readonly store = inject(HomeStore);
 
-  readonly selectedTagId = signal<number | undefined>(undefined);
-  readonly tags = toSignal(fromProcedure(this.client.tag.list.query)(), { initialValue: [] });
-  readonly selectedTag = computed(() => {
-    return this.tags().find(tag => tag.id === this.selectedTagId());
+  readonly articles = this.store.selectSignal(selectAll);
+  readonly tags = this.store.selectSignal(state => state.tags);
+  readonly selectedTagId = this.store.selectSignal(state => state.selectedTagId);
+  readonly selectedTag = this.store.selectSignal(state => {
+    return state.tags.find(tag => tag.id === state.selectedTagId);
   });
 
-  private readonly fetchArticles = toSignal(
-    toObservable(this.selectedTagId).pipe(
-      switchMap(tagId => this.client.article.list.query(tagId ? { tagId } : undefined))
-    ),
-    { initialValue: [] }
-  );
-  readonly updateArticle = signal<Awaited<ReturnType<typeof this.client.article.favorite.mutate>> | null>(null);
-  readonly articles = computed(() => {
-    const fetchArticles = this.fetchArticles();
-    const updatedArticle = this.updateArticle();
-    if (updatedArticle) {
-      const index = fetchArticles.findIndex(article => article.id === updatedArticle.id);
-      fetchArticles[index] = updatedArticle;
-    }
-
-    return fetchArticles;
+  readonly fetchData = effect(() => {
+    this.store.getArticles(this.selectedTagId());
   });
+
+  ngOnInit(): void {
+    this.store.getTags();
+  }
 
   onChangeTag(tagId: number) {
-    this.selectedTagId.set(tagId);
+    this.store.updateSelectedTagId(tagId);
   }
 
   onClearTag() {
-    this.selectedTagId.set(undefined);
+    this.store.updateSelectedTagId(undefined);
   }
 
   onFavorite(articleId: number, isFavorited: boolean) {
-    fromProcedure(this.client.article.favorite.mutate)({ articleId, isFavorited }).subscribe(updatedArticle => {
-      this.updateArticle.set(updatedArticle);
-    });
+    this.store.favorite({ articleId, isFavorited });
   }
 }
