@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '@ng-realworld/data-access/service';
-import { fromProcedure, injectTRPC } from '@ng-realworld/data-access/trpc-client';
+import { fromProcedure, injectTRPC, isTRPCClientError } from '@ng-realworld/data-access/trpc-client';
 
 @Component({
   selector: 'ng-realworld-header',
@@ -69,7 +69,9 @@ export class HeaderComponent implements OnInit {
           this.authService.authenticated(user);
         },
         error: (err: unknown) => {
-          console.log({ err });
+          if (isTRPCClientError(err) && err.data?.code === 'INTERNAL_SERVER_ERROR') {
+            this.authService.logout();
+          }
         },
       });
     }

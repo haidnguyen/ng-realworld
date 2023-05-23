@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { User } from '@ng-realworld/data-access/model';
+import { injectTRPC } from '@ng-realworld/data-access/trpc-client';
 
 const STORAGE_TOKEN_KEY = '__TOKEN__';
 
@@ -7,6 +8,7 @@ const STORAGE_TOKEN_KEY = '__TOKEN__';
   providedIn: 'root',
 })
 export class AuthService {
+  private readonly client = injectTRPC();
   readonly currentUser = signal<User | null>(null);
   readonly isAuth = signal(!!localStorage.getItem(STORAGE_TOKEN_KEY));
 
@@ -24,6 +26,7 @@ export class AuthService {
   }
 
   logout() {
+    this.client.user.logout.mutate();
     localStorage.clear();
     this.isAuth.set(false);
   }

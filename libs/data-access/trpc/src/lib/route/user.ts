@@ -46,8 +46,8 @@ const loginProcedure = procedure.input(userLoginSchema).mutation(async ({ input,
   }
 
   const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '600s' });
-  const refreshToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
-  ctx.res.cookie('refreshToken', refreshToken, { httpOnly: true });
+  const refreshToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7 days' });
+  ctx.res.cookie('refreshToken', refreshToken, { httpOnly: true, expires: new Date(Date.now() + 7 * 86400000) });
   await ctx.prisma.user.update({
     where: {
       id: user.id,
@@ -86,9 +86,9 @@ const accessTokenProcedure = procedure.query(async ({ ctx }) => {
     throw unauthorizedError;
   }
 
-  const updatedRefreshToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
+  const updatedRefreshToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7 days' });
   const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '600s' });
-  ctx.res.cookie('refreshToken', updatedRefreshToken, { httpOnly: true });
+  ctx.res.cookie('refreshToken', updatedRefreshToken, { httpOnly: true, expires: new Date(Date.now() + 7 * 86400000) });
   await ctx.prisma.user.update({ where: { id: user.id }, data: { refreshToken: updatedRefreshToken } });
 
   return { token };
@@ -143,6 +143,20 @@ const getByUsernameProcedure = procedure.input(userSchema.pick({ username: true 
   return user;
 });
 
+const logoutProcedure = protectedProcedure.mutation(async ({ ctx }) => {
+  await ctx.prisma.user.update({
+    where: {
+      id: ctx.user.id,
+    },
+    data: {
+      refreshToken: null,
+    },
+  });
+
+  ctx.res.cookie('refreshToken', 'deleted', { httpOnly: true, expires: new Date(0) });
+  return { message: 'SUCCESS' };
+});
+
 export const userRouter = router({
   create: createUserProcedure,
   login: loginProcedure,
@@ -150,4 +164,5 @@ export const userRouter = router({
   accessToken: accessTokenProcedure,
   update: updateProcedure,
   getByUsername: getByUsernameProcedure,
+  logout: logoutProcedure,
 });
