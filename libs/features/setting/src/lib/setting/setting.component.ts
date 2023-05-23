@@ -9,61 +9,8 @@ import { fromProcedure, injectTRPC } from '@ng-realworld/data-access/trpc-client
   selector: 'ng-realworld-setting',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  template: `
-    <div class="settings-page">
-      <div class="container page">
-        <div class="row">
-          <div class="col-md-6 offset-md-3 col-xs-12">
-            <h1 class="text-xs-center">Your Settings</h1>
-
-            <form [formGroup]="form" (ngSubmit)="onSubmit()">
-              <fieldset>
-                <fieldset class="form-group">
-                  <input
-                    class="form-control"
-                    type="text"
-                    placeholder="URL of profile picture"
-                    formControlName="image"
-                  />
-                </fieldset>
-                <fieldset class="form-group">
-                  <input
-                    class="form-control form-control-lg"
-                    type="text"
-                    placeholder="Your Name"
-                    formControlName="username"
-                  />
-                </fieldset>
-                <fieldset class="form-group">
-                  <textarea
-                    class="form-control form-control-lg"
-                    rows="8"
-                    placeholder="Short bio about you"
-                    formControlName="bio"
-                  ></textarea>
-                </fieldset>
-                <fieldset class="form-group">
-                  <input class="form-control form-control-lg" type="text" placeholder="Email" formControlName="email" />
-                </fieldset>
-                <fieldset class="form-group">
-                  <input
-                    class="form-control form-control-lg"
-                    type="password"
-                    placeholder="Password"
-                    formControlName="password"
-                  />
-                </fieldset>
-                <button class="btn btn-lg btn-primary pull-xs-right" type="submit">Update Settings</button>
-              </fieldset>
-            </form>
-            <hr />
-            <button class="btn btn-outline-danger" (click)="onLogout()">Or click here to logout.</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [],
+  templateUrl: './setting.component.html',
+  styleUrls: ['./setting.style.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SettingComponent {

@@ -12,13 +12,7 @@ type Awaited<T> = T extends Promise<infer U> ? U : never;
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './home.component.html',
-  styles: [
-    `
-      .pointer {
-        cursor: pointer;
-      }
-    `,
-  ],
+  styleUrls: ['./home.style.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
