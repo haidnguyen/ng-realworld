@@ -1,0 +1,23 @@
+<div class="article-preview" *ngIf="article() as article">
+  <div class="article-meta">
+    <a routerLink="/"><img src="http://i.imgur.com/N4VcUeJ.jpg" /></a>
+    <div class="info">
+      <a [routerLink]="['/', 'profile', article.author.username]" class="author">
+        {{ article.author.username }}
+      </a>
+      <span class="date">{{ article.createdAt | date : 'mediumDate' }}</span>
+    </div>
+    <button
+      class="btn btn-outline-primary btn-sm pull-xs-right"
+      (click)="onFavorite({ articleId: article.id, isFavorited: !article.favorited })"
+    >
+      <i class="ion-heart"></i>
+      {{ article.favoritesCount }}
+    </button>
+  </div>
+  <a [routerLink]="['/', 'article', article.slug]" class="preview-link">
+    <h1>{{ article.title }}</h1>
+    <p>{{ article.description }}</p>
+    <span>Read more...</span>
+  </a>
+</div>

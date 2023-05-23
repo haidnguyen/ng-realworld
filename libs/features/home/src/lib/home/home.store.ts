@@ -1,19 +1,22 @@
 import { Injectable } from '@angular/core';
-import { AppRouter } from '@ng-realworld/data-access/trpc';
-import { fromProcedure, injectTRPC } from '@ng-realworld/data-access/trpc-client';
+import {
+  ArticleListItemOutput,
+  FavoriteMutateInput,
+  TagListItemOutput,
+  fromProcedure,
+  injectTRPC,
+} from '@ng-realworld/data-access/trpc-client';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
 import { EntityState, createEntityAdapter } from '@ngrx/entity';
-import { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
+import update from 'immutability-helper';
 import { Observable, switchMap, tap } from 'rxjs';
 
-type Article = inferRouterOutputs<AppRouter>['article']['list'][number];
-type Tags = inferRouterOutputs<AppRouter>['tag']['list'];
-interface HomeState extends EntityState<Article> {
-  tags: Tags;
-  selectedTagId?: Tags[number]['id'];
+interface HomeState extends EntityState<ArticleListItemOutput> {
+  tags: TagListItemOutput[];
+  selectedTagId?: TagListItemOutput['id'];
 }
 
-const adapter = createEntityAdapter<Article>({
+const adapter = createEntityAdapter<ArticleListItemOutput>({
   selectId: article => article.id,
 });
 
@@ -26,20 +29,16 @@ export const { selectIds, selectEntities, selectAll } = adapter.getSelectors();
 export class HomeStore extends ComponentStore<HomeState> {
   private readonly client = injectTRPC();
 
-  readonly setArticles = this.updater((state, articles: Article[]) => {
+  readonly setArticles = this.updater((state, articles: ArticleListItemOutput[]) => {
     return adapter.setAll(articles, state);
   });
-  readonly setArticle = this.updater((state, article: Article) => {
+  readonly setArticle = this.updater((state, article: ArticleListItemOutput) => {
     return adapter.setOne(article, state);
   });
-  readonly setTags = this.updater((state, tags: Tags) => ({
-    ...state,
-    tags,
-  }));
-  readonly updateSelectedTagId = this.updater((state, tagId: HomeState['selectedTagId']) => ({
-    ...state,
-    selectedTagId: tagId,
-  }));
+  readonly setTags = this.updater((state, tags: TagListItemOutput[]) => update(state, { tags: { $set: tags } }));
+  readonly updateSelectedTagId = this.updater((state, tagId: HomeState['selectedTagId']) =>
+    update(state, { selectedTagId: { $set: tagId } })
+  );
 
   readonly getArticles = this.effect((tagId$: Observable<number | undefined>) => {
     return tagId$.pipe(
@@ -67,7 +66,7 @@ export class HomeStore extends ComponentStore<HomeState> {
     )
   );
 
-  readonly favorite = this.effect<inferRouterInputs<AppRouter>['article']['favorite']>(id$ =>
+  readonly favorite = this.effect<FavoriteMutateInput>(id$ =>
     id$.pipe(
       switchMap(input => this.client.article.favorite.mutate(input)),
       tap(updatedArticle => {
