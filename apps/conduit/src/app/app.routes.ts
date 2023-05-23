@@ -35,4 +35,8 @@ export const appRoutes: Route[] = [
     path: 'profile/:username',
     loadComponent: () => import('@ng-realworld/features/profile').then(m => m.ProfileComponent),
   },
+  {
+    path: 'article/:slug',
+    loadComponent: () => import('@ng-realworld/features/article').then(m => m.ArticleComponent),
+  },
 ];

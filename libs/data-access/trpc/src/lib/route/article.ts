@@ -1,4 +1,5 @@
 import { FavoritedArticle } from '@prisma/client';
+import { TRPCError } from '@trpc/server';
 import { map, merge, omit, pipe } from 'remeda';
 import { z } from 'zod';
 import { procedure, protectedProcedure, router } from '../core';
@@ -115,8 +116,28 @@ const favoriteProcedure = protectedProcedure
     return pipe(updatedArticle, computedFavoritesCount(ctx.user.id), omit(['favoritedArticles']));
   });
 
+const getBySlugProcedure = procedure.input(z.object({ slug: z.string() })).query(async ({ ctx, input }) => {
+  const article = await ctx.prisma.article.findUnique({
+    where: {
+      slug: input.slug,
+    },
+    include: {
+      author: true,
+      favoritedArticles: true,
+    },
+  });
+  if (!article) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+    });
+  }
+
+  return pipe(article, computedFavoritesCount(ctx.user?.id), omit(['favoritedArticles']));
+});
+
 export const articleRouter = router({
   add: addProcedure,
   list: listProcedure,
   favorite: favoriteProcedure,
+  getBySlug: getBySlugProcedure,
 });
