@@ -30,4 +30,8 @@ export class ArticleComponent {
       })
     )
   );
+
+  onFollow(followingId: number) {
+    console.log({ followingId });
+  }
 }

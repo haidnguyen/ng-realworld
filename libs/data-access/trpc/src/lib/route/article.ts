@@ -3,6 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { map, merge, omit, pipe } from 'remeda';
 import { z } from 'zod';
 import { procedure, protectedProcedure, router } from '../core';
+import { userSelect } from '../select';
 
 type WithFavoritedArticles = {
   favoritedArticles: FavoritedArticle[];
@@ -122,7 +123,9 @@ const getBySlugProcedure = procedure.input(z.object({ slug: z.string() })).query
       slug: input.slug,
     },
     include: {
-      author: true,
+      author: {
+        select: userSelect,
+      },
       favoritedArticles: true,
     },
   });

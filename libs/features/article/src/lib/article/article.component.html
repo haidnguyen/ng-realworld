@@ -9,7 +9,7 @@
           <a [routerLink]="['/profile', article.author.username]" class="author">{{ article.author.username }}</a>
           <span class="date">{{ article.createdAt | date : 'mediumDate' }}</span>
         </div>
-        <button class="btn btn-sm btn-outline-secondary">
+        <button class="btn btn-sm btn-outline-secondary" (click)="onFollow(article.authorId)">
           <i class="ion-plus-round"></i>
           &nbsp; Follow {{ article.author.username }}
           <span class="counter">(0)</span>

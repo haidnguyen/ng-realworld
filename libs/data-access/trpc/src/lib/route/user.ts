@@ -5,19 +5,11 @@ import {
   userTokenPayloadSchema,
   userUpdateSchema,
 } from '@ng-realworld/data-access/model';
-import { Prisma } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { JWT_SECRET, SALT_ROUND, procedure, protectedProcedure, router } from '../core';
-
-const userCommonSelect: Prisma.UserSelect = {
-  id: true,
-  username: true,
-  email: true,
-  bio: true,
-  image: true,
-};
+import { authorSelect, userSelect } from '../select';
 
 const createUserProcedure = procedure.input(userRegistrationSchema).mutation(async ({ input, ctx }) => {
   const hashedPassword = await bcrypt.hash(input.password, SALT_ROUND);
@@ -27,7 +19,7 @@ const createUserProcedure = procedure.input(userRegistrationSchema).mutation(asy
       email: input.email,
       password: hashedPassword,
     },
-    select: userCommonSelect,
+    select: userSelect,
   });
   return createdUser;
 });
@@ -55,7 +47,7 @@ const loginProcedure = procedure.input(userLoginSchema).mutation(async ({ input,
     data: {
       refreshToken,
     },
-    select: userCommonSelect,
+    select: userSelect,
   });
 
   return {
@@ -110,7 +102,7 @@ const updateProcedure = protectedProcedure.input(userUpdateSchema).mutation(asyn
   const updatedUser = await ctx.prisma.user.update({
     where: { id: ctx.user.id },
     data,
-    select: userCommonSelect,
+    select: userSelect,
   });
 
   return updatedUser;
@@ -119,19 +111,7 @@ const updateProcedure = protectedProcedure.input(userUpdateSchema).mutation(asyn
 const getByUsernameProcedure = procedure.input(userSchema.pick({ username: true })).query(async ({ ctx, input }) => {
   const user = await ctx.prisma.user.findUnique({
     where: { username: input.username },
-    select: {
-      id: true,
-      username: true,
-      email: true,
-      bio: true,
-      image: true,
-      articles: {
-        include: {
-          author: true,
-          tags: true,
-        },
-      },
-    },
+    select: authorSelect,
   });
 
   if (!user) {
