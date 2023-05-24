@@ -20,6 +20,8 @@ model User {
   refreshToken      String?
   articles          Article[]
   favoritedArticles FavoritedArticle[]
+  followers         Follow[]           @relation("follower")
+  followings        Follow[]           @relation("following")
 }
 
 model Article {
@@ -51,4 +53,13 @@ model FavoritedArticle {
   createdAt DateTime @default(now())
 
   @@id([userId, articleId])
+}
+
+model Follow {
+  followingId Int
+  following   User @relation("following", fields: [followingId], references: [id])
+  followerId  Int
+  follower    User @relation("follower", fields: [followerId], references: [id])
+
+  @@id([followingId, followerId])
 }

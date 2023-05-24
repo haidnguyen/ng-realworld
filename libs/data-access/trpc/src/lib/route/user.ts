@@ -2,14 +2,15 @@ import {
   userLoginSchema,
   userRegistrationSchema,
   userSchema,
+  userSelect,
   userTokenPayloadSchema,
   userUpdateSchema,
 } from '@ng-realworld/data-access/model';
 import { TRPCError } from '@trpc/server';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
+import { omit } from 'remeda';
 import { JWT_SECRET, SALT_ROUND, procedure, protectedProcedure, router } from '../core';
-import { authorSelect, userSelect } from '../select';
 
 const createUserProcedure = procedure.input(userRegistrationSchema).mutation(async ({ input, ctx }) => {
   const hashedPassword = await bcrypt.hash(input.password, SALT_ROUND);
@@ -111,7 +112,15 @@ const updateProcedure = protectedProcedure.input(userUpdateSchema).mutation(asyn
 const getByUsernameProcedure = procedure.input(userSchema.pick({ username: true })).query(async ({ ctx, input }) => {
   const user = await ctx.prisma.user.findUnique({
     where: { username: input.username },
-    select: authorSelect,
+    include: {
+      _count: true,
+      articles: {
+        include: {
+          author: { select: userSelect },
+          tags: true,
+        },
+      },
+    },
   });
 
   if (!user) {
@@ -120,7 +129,7 @@ const getByUsernameProcedure = procedure.input(userSchema.pick({ username: true 
     });
   }
 
-  return user;
+  return omit(user, ['password']);
 });
 
 const logoutProcedure = protectedProcedure.mutation(async ({ ctx }) => {

@@ -43,7 +43,7 @@ export class HomeStore extends ComponentStore<HomeState> {
   readonly getArticles = this.effect((tagId$: Observable<number | undefined>) => {
     return tagId$.pipe(
       switchMap(tagId =>
-        fromProcedure(this.client.article.list.query)(tagId ? { tagId } : undefined).pipe(
+        fromProcedure(this.client.article.list.query)({ tagId }).pipe(
           tapResponse({
             next: data => {
               this.setArticles(data);

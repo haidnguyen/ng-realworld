@@ -1,9 +1,9 @@
+import { userSelect } from '@ng-realworld/data-access/model';
 import { FavoritedArticle } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { map, merge, omit, pipe } from 'remeda';
 import { z } from 'zod';
 import { procedure, protectedProcedure, router } from '../core';
-import { userSelect } from '../select';
 
 type WithFavoritedArticles = {
   favoritedArticles: FavoritedArticle[];
@@ -12,10 +12,9 @@ type WithFavoritedArticles = {
 const computedFavoritesCount =
   (userId?: number) =>
   <T extends WithFavoritedArticles>(article: T) => {
-    const favoritesCount = article.favoritedArticles.length;
     const favorited = !!article.favoritedArticles.find(item => item.userId === userId);
 
-    return merge(article, { favoritesCount, favorited });
+    return merge(article, { favorited });
   };
 
 const addProcedure = protectedProcedure
@@ -57,11 +56,10 @@ const addProcedure = protectedProcedure
 
 const listProcedure = procedure
   .input(
-    z
-      .object({
-        tagId: z.number().optional(),
-      })
-      .optional()
+    z.object({
+      tagId: z.number().optional(),
+      userId: z.number().optional(),
+    })
   )
   .query(async ({ ctx, input }) => {
     const articles = await ctx.prisma.article.findMany({
@@ -71,10 +69,12 @@ const listProcedure = procedure
             id: input?.tagId,
           },
         },
+        authorId: input.userId,
       },
       include: {
-        author: true,
+        author: { select: userSelect },
         favoritedArticles: true,
+        _count: true,
       },
       orderBy: {
         createdAt: 'desc',
@@ -110,8 +110,9 @@ const favoriteProcedure = protectedProcedure
         },
       },
       include: {
-        author: true,
+        author: { select: userSelect },
         favoritedArticles: true,
+        _count: true,
       },
     });
     return pipe(updatedArticle, computedFavoritesCount(ctx.user.id), omit(['favoritedArticles']));
@@ -126,7 +127,9 @@ const getBySlugProcedure = procedure.input(z.object({ slug: z.string() })).query
       author: {
         select: userSelect,
       },
+      tags: true,
       favoritedArticles: true,
+      _count: true,
     },
   });
   if (!article) {

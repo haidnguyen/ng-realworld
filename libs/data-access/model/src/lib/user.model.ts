@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
 export const userSchema = z.object({
@@ -7,6 +8,13 @@ export const userSchema = z.object({
   bio: z.string(),
   image: z.string().nullable(),
 });
+export const userSelect: Prisma.UserSelect = {
+  id: true,
+  username: true,
+  email: true,
+  image: true,
+  bio: true,
+};
 
 export const userRegistrationSchema = userSchema.pick({ username: true, email: true }).extend({ password: z.string() });
 export const userLoginSchema = userSchema.pick({ email: true }).extend({ password: z.string() });

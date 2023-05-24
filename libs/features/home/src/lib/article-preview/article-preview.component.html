@@ -12,7 +12,7 @@
       (click)="onFavorite({ articleId: article.id, isFavorited: !article.favorited })"
     >
       <i class="ion-heart"></i>
-      {{ article.favoritesCount }}
+      {{ article._count.favoritedArticles }}
     </button>
   </div>
   <a [routerLink]="['/', 'article', article.slug]" class="preview-link">
