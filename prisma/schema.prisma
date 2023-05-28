@@ -22,6 +22,7 @@ model User {
   favoritedArticles FavoritedArticle[]
   followers         Follow[]           @relation("follower")
   followings        Follow[]           @relation("following")
+  comments          Comment[]
 }
 
 model Article {
@@ -36,6 +37,7 @@ model Article {
   authorId          Int
   tags              Tag[]
   favoritedArticles FavoritedArticle[]
+  Comment           Comment[]
 }
 
 model Tag {
@@ -62,4 +64,14 @@ model Follow {
   follower    User @relation("follower", fields: [followerId], references: [id])
 
   @@id([followingId, followerId])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id])
+  articleId Int
+  article   Article  @relation(fields: [articleId], references: [id])
+  createdAt DateTime @default(now())
+  body      String
 }

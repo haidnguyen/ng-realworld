@@ -7,3 +7,6 @@ export type FavoriteMutateInput = inferRouterInputs<AppRouter>['article']['favor
 export type ArticleItemOutput = inferRouterOutputs<AppRouter>['article']['get'];
 export type ArticleItemInput = inferRouterInputs<AppRouter>['article']['get'];
 export type UserItemOutput = inferRouterOutputs<AppRouter>['user']['getById'];
+
+export type CommentListOutput = inferRouterOutputs<AppRouter>['comment']['list'];
+export type CommentItemOutput = inferRouterOutputs<AppRouter>['comment']['add'];
