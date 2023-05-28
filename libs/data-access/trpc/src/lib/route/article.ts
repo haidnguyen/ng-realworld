@@ -112,6 +112,7 @@ const favoriteProcedure = protectedProcedure
       include: {
         author: { select: userSelect },
         favoritedArticles: true,
+        tags: true,
         _count: true,
       },
     });
@@ -141,7 +142,30 @@ const getBySlugProcedure = procedure.input(z.object({ slug: z.string() })).query
   return pipe(article, computedFavoritesCount(ctx.user?.id), omit(['favoritedArticles']));
 });
 
+const getProcedure = procedure
+  .input(z.object({ slug: z.string().optional(), id: z.number().optional() }))
+  .query(async ({ ctx, input }) => {
+    const article = await ctx.prisma.article.findUnique({
+      where: {
+        slug: input.slug,
+        id: input.id,
+      },
+      include: {
+        tags: true,
+        favoritedArticles: true,
+        _count: true,
+      },
+    });
+    if (!article) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+      });
+    }
+    return pipe(article, computedFavoritesCount(ctx.user?.id), omit(['favoritedArticles']));
+  });
+
 export const articleRouter = router({
+  get: getProcedure,
   add: addProcedure,
   list: listProcedure,
   favorite: favoriteProcedure,

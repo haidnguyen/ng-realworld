@@ -146,6 +146,55 @@ const logoutProcedure = protectedProcedure.mutation(async ({ ctx }) => {
   return { message: 'SUCCESS' };
 });
 
+const followProcedure = protectedProcedure.input(userSchema.pick({ id: true })).mutation(async ({ ctx, input }) => {
+  const followers = await ctx.prisma.user.findMany({
+    where: {
+      id: input.id,
+      followers: {
+        some: {
+          followingId: ctx.user.id,
+        },
+      },
+    },
+  });
+  const isFollowed = followers.length > 0;
+
+  await ctx.prisma.user.update({
+    where: { id: ctx.user.id },
+    data: {
+      followings: {
+        ...(isFollowed
+          ? {
+              delete: {
+                followingId_followerId: {
+                  followerId: input.id,
+                  followingId: ctx.user.id,
+                },
+              },
+            }
+          : {
+              create: {
+                followerId: input.id,
+              },
+            }),
+      },
+    },
+  });
+
+  return { msg: 'SUCCESS' };
+});
+
+const getByIdProcedure = procedure.input(userSchema.pick({ id: true })).query(async ({ input, ctx }) => {
+  const user = await ctx.prisma.user.findUnique({
+    where: { id: input.id },
+    select: {
+      _count: true,
+      ...userSelect,
+    },
+  });
+  return user;
+});
+
 export const userRouter = router({
   create: createUserProcedure,
   login: loginProcedure,
@@ -154,4 +203,6 @@ export const userRouter = router({
   update: updateProcedure,
   getByUsername: getByUsernameProcedure,
   logout: logoutProcedure,
+  follow: followProcedure,
+  getById: getByIdProcedure,
 });

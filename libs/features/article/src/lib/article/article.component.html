@@ -3,19 +3,22 @@
     <div class="container">
       <h1>{{ article.title }}</h1>
 
-      <div class="article-meta">
-        <a [routerLink]="['/profile', article.author.username]"><img src="http://i.imgur.com/Qr71crq.jpg" /></a>
+      <div class="article-meta" *ngIf="author() as author">
+        <a [routerLink]="['/profile', author.username]"><img src="http://i.imgur.com/Qr71crq.jpg" /></a>
         <div class="info">
-          <a [routerLink]="['/profile', article.author.username]" class="author">{{ article.author.username }}</a>
+          <a [routerLink]="['/profile', author.username]" class="author">{{ author.username }}</a>
           <span class="date">{{ article.createdAt | date : 'mediumDate' }}</span>
         </div>
         <button class="btn btn-sm btn-outline-secondary" (click)="onFollow(article.authorId)">
           <i class="ion-plus-round"></i>
-          &nbsp; Follow {{ article.author.username }}
-          <span class="counter">(0)</span>
+          &nbsp; Follow {{ author.username }}
+          <span class="counter">({{ author._count.followers }})</span>
         </button>
         &nbsp;&nbsp;
-        <button class="btn btn-sm btn-outline-primary">
+        <button
+          class="btn btn-sm btn-outline-primary"
+          (click)="onFavorite({ articleId: article.id, isFavorited: !article.favorited })"
+        >
           <i class="ion-heart"></i>
           &nbsp; Favorite Post
           <span class="counter">({{ article._count.favoritedArticles }})</span>
@@ -33,17 +36,17 @@
 
     <hr />
 
-    <div class="article-actions">
+    <div class="article-actions" *ngIf="author() as author">
       <div class="article-meta">
         <a href="profile.html"><img src="http://i.imgur.com/Qr71crq.jpg" /></a>
         <div class="info">
-          <a href="" class="author">{{ article.author.username }}</a>
+          <a href="" class="author">{{ author.username }}</a>
           <span class="date">{{ article.createdAt | date : 'mediumDate' }}</span>
         </div>
 
         <button class="btn btn-sm btn-outline-secondary">
           <i class="ion-plus-round"></i>
-          &nbsp; Follow {{ article.author.username }}
+          &nbsp; Follow {{ author.username }} ({{ author._count.followers }})
         </button>
         &nbsp;
         <button class="btn btn-sm btn-outline-primary">
